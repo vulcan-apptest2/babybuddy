@@ -51,7 +51,6 @@ create the following settings before pushing:
 heroku config:set DISABLE_COLLECTSTATIC=1
 heroku config:set DJANGO_SETTINGS_MODULE=babybuddy.settings.heroku
 heroku config:set SECRET_KEY=<CHANGE TO SOMETHING RANDOM>
-heroku config:set TIME_ZONE=<DESIRED DEFAULT TIMEZONE>
 ```
 
 See [Configuration](configuration.md) for other settings that can be controlled
