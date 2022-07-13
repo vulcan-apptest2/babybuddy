@@ -8,7 +8,7 @@ from django.utils.translation import gettext as _
 from taggit.forms import TagField
 
 from core import models
-from core.widgets import TagsEditor
+from core.widgets import TagsEditor, ChildRadioSelect
 
 
 def set_initial_values(kwargs, form_type):
@@ -143,6 +143,7 @@ class PumpingForm(CoreModelForm):
         model = models.Pumping
         fields = ["child", "amount", "time", "notes"]
         widgets = {
+            "child": ChildRadioSelect,
             "time": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
@@ -158,6 +159,7 @@ class DiaperChangeForm(CoreModelForm, TaggableModelForm):
         model = models.DiaperChange
         fields = ["child", "time", "wet", "solid", "color", "amount", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect(),
             "time": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
@@ -173,6 +175,7 @@ class FeedingForm(CoreModelForm, TaggableModelForm):
         model = models.Feeding
         fields = ["child", "start", "end", "type", "method", "amount", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "start": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
@@ -194,12 +197,13 @@ class NoteForm(CoreModelForm, TaggableModelForm):
         model = models.Note
         fields = ["child", "note", "time", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "time": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
                     "data-td-target": "#datetimepicker_time",
                 }
-            )
+            ),
         }
 
 
@@ -208,6 +212,7 @@ class SleepForm(CoreModelForm, TaggableModelForm):
         model = models.Sleep
         fields = ["child", "start", "end", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "start": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
@@ -229,6 +234,7 @@ class TemperatureForm(CoreModelForm, TaggableModelForm):
         model = models.Temperature
         fields = ["child", "temperature", "time", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "time": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
@@ -244,12 +250,13 @@ class TimerForm(CoreModelForm):
         model = models.Timer
         fields = ["child", "name", "start"]
         widgets = {
+            "child": ChildRadioSelect,
             "start": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
                     "data-td-target": "#datetimepicker_start",
                 }
-            )
+            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -268,6 +275,7 @@ class TummyTimeForm(CoreModelForm, TaggableModelForm):
         model = models.TummyTime
         fields = ["child", "start", "end", "milestone", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "start": forms.DateTimeInput(
                 attrs={
                     "autocomplete": "off",
@@ -288,6 +296,7 @@ class WeightForm(CoreModelForm, TaggableModelForm):
         model = models.Weight
         fields = ["child", "weight", "date", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "date": forms.DateInput(
                 attrs={
                     "autocomplete": "off",
@@ -303,6 +312,7 @@ class HeightForm(CoreModelForm, TaggableModelForm):
         model = models.Height
         fields = ["child", "height", "date", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "date": forms.DateInput(
                 attrs={
                     "autocomplete": "off",
@@ -318,6 +328,7 @@ class HeadCircumferenceForm(CoreModelForm, TaggableModelForm):
         model = models.HeadCircumference
         fields = ["child", "head_circumference", "date", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "date": forms.DateInput(
                 attrs={
                     "autocomplete": "off",
@@ -333,6 +344,7 @@ class BMIForm(CoreModelForm, TaggableModelForm):
         model = models.BMI
         fields = ["child", "bmi", "date", "notes", "tags"]
         widgets = {
+            "child": ChildRadioSelect,
             "date": forms.DateInput(
                 attrs={
                     "autocomplete": "off",
