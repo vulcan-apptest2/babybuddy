@@ -61,6 +61,18 @@ BabyBuddy.DatetimePicker = function (moment) {
                     locale: moment.locale(),
                 },
             };
+
+            // Provide the initial date value from the form, if available. This is not
+            // strictly necessary but acts as a workaround for a bug with certain
+            // locales e.g., Portuguese (pt), that causes the default value to be lost
+            // in the form.
+            // @see https://github.com/tempusdominus/bootstrap-4/issues/189#issuecomment-590791416
+            var id = element.attr('id');
+            var input = element.find(`input[data-target="#${id}"]`)
+            if (input.length === 1) {
+                defaultOptions.date = input.val()
+            }
+
             new tempusDominus.TempusDominus(element, Object.assign(defaultOptions, options));
         }
     };
@@ -89,9 +101,14 @@ BabyBuddy.PullToRefresh = function(ptr) {
 /**
  * Fix for duplicate form submission from double pressing submit
  */
+function preventDoubleSubmit() {
+    return false;
+}
+$('form').off("submit", preventDoubleSubmit);
 $("form").on("submit", function() {
-    $(this).find("button[type='submit']").prop('disabled', true);
+    $(this).on("submit", preventDoubleSubmit);
 });
+
 /* Baby Buddy Timer
  *
  * Uses a supplied ID to run a timer. The element using the ID must have

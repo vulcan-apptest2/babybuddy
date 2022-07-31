@@ -4,7 +4,7 @@ The default username and password for Baby Buddy is `admin`/`admin`. For any
 deployment, **log in and change the default password immediately**.
 
 Many of Baby Buddy's configuration settings can be controlled using environment
-variables - see [Configuration](configuration.md) for detailed information.
+variables - see [Configuration](../configuration/intro.md) for detailed information.
 
 ## Docker
 
@@ -53,7 +53,7 @@ heroku config:set DJANGO_SETTINGS_MODULE=babybuddy.settings.heroku
 heroku config:set SECRET_KEY=<CHANGE TO SOMETHING RANDOM>
 ```
 
-See [Configuration](configuration.md) for other settings that can be controlled
+See [Configuration](../configuration/intro.md) for other settings that can be controlled
 by `heroku config:set`.
 
 After an initial push, execute the following commands:
@@ -82,7 +82,7 @@ TIME_ZONE=<DESIRED DEFAULT TIMEZONE>
 AWS_STORAGE_BUCKET_NAME=<DESIRED BUCKET NAME> # only if file storage is needed
 ```
 
-See [Configuration](configuration.md) for other environment variables available
+See [Configuration](../configuration/intro.md) for other environment variables available
 for your instance of babybuddy.
 
 After that, you just have to push babybuddy code repository to the Git
