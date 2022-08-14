@@ -3,7 +3,22 @@ from django import forms
 from django.contrib.auth.forms import PasswordChangeForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Settings
+from core.widgets import TimeInput
+
+from .models import Settings, SiteSettings
+
+
+class SiteSettingsForm(forms.ModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = [
+            "nap_start_min",
+            "nap_start_max",
+        ]
+        widgets = {
+            "nap_start_min": TimeInput(),
+            "nap_start_max": TimeInput(),
+        }
 
 
 class UserAddForm(UserCreationForm):
