@@ -27,8 +27,6 @@
                     <th>{% trans "Child" %}</th>
                 {% endif %}
                 <th>{% trans "Duration" %}</th>
-                <th>{% trans "End" %}</th>
-                <th>{% trans "Active" %}</th>
                 <th>{% trans "User" %}</th>
             </tr>
             </thead>
@@ -45,12 +43,6 @@
                         </td>
                     {% endif %}
                     <td>{{ timer.duration|duration_string }}</td>
-                    <td>
-                        {% if timer.end %}
-                            {{ timer.end|datetime_short }}
-                        {% endif %}
-                    </td>
-                    <td>{{ timer.active|bool_icon }}</td>
                     <td>{{ timer.user_username }}</td>
                 </tr>
             {% empty %}
@@ -62,11 +54,4 @@
         </table>
     </div>
     {% include 'babybuddy/paginator.html' %}
-
-    {% if perms.core.delete_timer %}
-        <a href="{% url 'core:timer-delete-inactive' %}" class="btn btn-sm btn-danger">
-            <i class="icon-delete" aria-hidden="true"></i> {% trans "Delete Inactive Timers" %}
-        </a>
-    {% endif %}
-
 {% endblock %}

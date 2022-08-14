@@ -91,12 +91,6 @@ class TimerViewSet(viewsets.ModelViewSet):
     filterset_class = filters.TimerFilter
 
     @action(detail=True, methods=["patch"])
-    def stop(self, request, pk=None):
-        timer = self.get_object()
-        timer.stop()
-        return Response(self.serializer_class(timer).data)
-
-    @action(detail=True, methods=["patch"])
     def restart(self, request, pk=None):
         timer = self.get_object()
         timer.restart()

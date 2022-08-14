@@ -106,31 +106,24 @@ class InitialValuesTestCase(FormsTestCaseBase):
         self.assertEqual(page.context["form"].initial["type"], f_three.type)
         self.assertEqual(page.context["form"].initial["method"], f_three.method)
 
-    def test_timer_set(self):
+    def test_timer_form_field_set(self):
         self.timer.stop()
 
         page = self.c.get("/sleep/add/")
         self.assertTrue("start" not in page.context["form"].initial)
         self.assertTrue("end" not in page.context["form"].initial)
 
-        page = self.c.get("/sleep/add/?timer={}".format(self.timer.id))
-        self.assertEqual(page.context["form"].initial["start"], self.timer.start)
-        self.assertEqual(page.context["form"].initial["end"], self.timer.end)
-
     def test_timer_stop_on_save(self):
-        end = timezone.localtime()
+        timer = models.Timer.objects.create(
+            user=self.user, start=timezone.localtime() - timezone.timedelta(minutes=30)
+        )
         params = {
             "child": self.child.id,
             "start": timezone.localtime(self.timer.start),
-            "end": timezone.localtime(end),
+            "end": timezone.localtime(),
         }
-        page = self.c.post(
-            "/sleep/add/?timer={}".format(self.timer.id), params, follow=True
-        )
+        page = self.c.post("/sleep/add/?timer={}".format(timer.id), params, follow=True)
         self.assertEqual(page.status_code, 200)
-        self.timer.refresh_from_db()
-        self.assertFalse(self.timer.active)
-        self.assertEqual(timezone.localtime(self.timer.end), params["end"])
 
 
 class BMIFormsTestCase(FormsTestCaseBase):
@@ -766,29 +759,6 @@ class TimerFormsTestCase(FormsTestCaseBase):
         self.assertContains(page, params["name"])
         self.timer.refresh_from_db()
         self.assertEqual(timezone.localtime(self.timer.start), params["start"])
-
-    def test_edit_stopped(self):
-        self.timer.stop()
-        params = {
-            "name": "Edit stopped timer",
-            "start": timezone.localtime(self.timer.start),
-            "end": timezone.localtime(self.timer.end),
-        }
-        page = self.c.post(
-            "/timers/{}/edit/".format(self.timer.id), params, follow=True
-        )
-        self.assertEqual(page.status_code, 200)
-
-    def test_delete_inactive(self):
-        models.Timer.objects.create(user=self.user)
-        self.assertEqual(models.Timer.objects.count(), 2)
-        self.timer.stop()
-        page = self.c.post("/timers/delete-inactive/", follow=True)
-        self.assertEqual(page.status_code, 200)
-        messages = list(page.context["messages"])
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "All inactive timers deleted.")
-        self.assertEqual(models.Timer.objects.count(), 1)
 
 
 class ValidationsTestCase(FormsTestCaseBase):
