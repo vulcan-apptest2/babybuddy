@@ -1,9 +1,6 @@
 if (typeof jQuery === 'undefined') {
   throw new Error('Baby Buddy requires jQuery.')
 }
-if (typeof moment === 'undefined') {
-  throw new Error('Baby Buddy requires moment.js.')
-}
 
 /**
  * Baby Buddy Namespace
@@ -15,57 +12,6 @@ if (typeof moment === 'undefined') {
 var BabyBuddy = function () {
     return {};
 }();
-
-/**
- * Datetime Picker.
- *
- * Provides modifications and defaults for the base datetime picker widget.
- *
- * @type {{init: BabyBuddy.DatetimePicker.init}}
- */
-BabyBuddy.DatetimePicker = function (moment) {
-    return {
-        init: function (element, options) {
-            let defaultOptions = {
-                display: {
-                    buttons: {
-                        close: true,
-                        today: true,
-                    },
-                    components: {
-                        calendar: true,
-                        clock: true,
-                        date: true,
-                        decades: true,
-                        hours: true,
-                        minutes: true,
-                        month: true,
-                        seconds: false,
-                        useTwentyfourHour: false,
-                        year: true,
-                    },
-                    icons: {
-                        clear: 'icon-delete',
-                        close: 'icon-cancel',
-                        date: 'icon-calendar',
-                        down: 'icon-arrow-down',
-                        next: 'icon-angle-circled-right',
-                        previous: 'icon-angle-circled-left',
-                        time: 'icon-clock',
-                        today: 'icon-today',
-                        up: 'icon-arrow-up',
-                    },
-                    viewMode: 'clock',
-                },
-                localization: {
-                    locale: moment.locale(),
-                },
-            };
-
-            new tempusDominus.TempusDominus(element, Object.assign(defaultOptions, options));
-        }
-    };
-}(moment);
 
 /**
  * Pull to refresh.
@@ -110,7 +56,7 @@ BabyBuddy.Timer = function ($) {
     var runIntervalId = null;
     var timerId = null;
     var timerElement = null;
-    var lastUpdate = moment();
+    var lastUpdate = new Date();
     var hidden = null;
 
     var Timer = {
@@ -118,14 +64,14 @@ BabyBuddy.Timer = function ($) {
             timerId = timer_id;
             timerElement = $('#' + element_id);
 
-            if (timerElement.length == 0) {
+            if (timerElement.length === 0) {
                 console.error('BBTimer: Timer element not found.');
                 return false;
             }
 
-            if (timerElement.find('.timer-seconds').length == 0
-                || timerElement.find('.timer-minutes').length == 0
-                || timerElement.find('.timer-hours').length == 0) {
+            if (timerElement.find('.timer-seconds').length === 0
+                || timerElement.find('.timer-minutes').length === 0
+                || timerElement.find('.timer-hours').length === 0) {
                 console.error('BBTimer: Element does not contain expected children.');
                 return false;
             }
@@ -148,7 +94,7 @@ BabyBuddy.Timer = function ($) {
         },
 
         handleVisibilityChange: function() {
-            if (!document[hidden] && moment().diff(lastUpdate) > 10000) {
+            if (!document[hidden] && (new Date()) - lastUpdate > 1) {
                 Timer.update();
             }
         },
@@ -183,11 +129,16 @@ BabyBuddy.Timer = function ($) {
             $.get('/api/timers/' + timerId + '/', function(data) {
                 if (data && 'duration' in data) {
                     clearInterval(runIntervalId);
-                    var duration = moment.duration(data.duration);
-                    timerElement.find('.timer-hours').text(duration.hours());
-                    timerElement.find('.timer-minutes').text(duration.minutes());
-                    timerElement.find('.timer-seconds').text(duration.seconds());
-                    lastUpdate = moment();
+                    var duration = data.duration.split(/[\s:.]/)
+                    if (duration.length === 5) {
+                        duration[0] = parseInt(duration[0]) * 24 + parseInt(duration[1]);
+                        duration[1] = duration[2];
+                        duration[2] = duration[3];
+                    }
+                    timerElement.find('.timer-hours').text(parseInt(duration[0]));
+                    timerElement.find('.timer-minutes').text(parseInt(duration[1]));
+                    timerElement.find('.timer-seconds').text(parseInt(duration[2]));
+                    lastUpdate = new Date()
 
                     if (data['active']) {
                         runIntervalId = setInterval(Timer.tick, 1000);
