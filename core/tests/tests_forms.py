@@ -33,18 +33,6 @@ class FormsTestCaseBase(TestCase):
             first_name="Child", last_name="One", birth_date=timezone.localdate()
         )
 
-    @staticmethod
-    def localdate_string(datetime=None):
-        """Converts an object to a local date string for form input."""
-        date_format = get_format("DATE_INPUT_FORMATS")[0]
-        return timezone.localdate(datetime).strftime(date_format)
-
-    @staticmethod
-    def localtime_string(datetime=None):
-        """Converts an object to a local time string for form input."""
-        datetime_format = get_format("DATETIME_INPUT_FORMATS")[0]
-        return timezone.localtime(datetime).strftime(datetime_format)
-
 
 class InitialValuesTestCase(FormsTestCaseBase):
     @classmethod
@@ -133,8 +121,8 @@ class InitialValuesTestCase(FormsTestCaseBase):
         end = timezone.localtime()
         params = {
             "child": self.child.id,
-            "start": self.localtime_string(self.timer.start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(self.timer.start),
+            "end": timezone.localtime(end),
         }
         page = self.c.post(
             "/sleep/add/?timer={}".format(self.timer.id), params, follow=True
@@ -142,7 +130,7 @@ class InitialValuesTestCase(FormsTestCaseBase):
         self.assertEqual(page.status_code, 200)
         self.timer.refresh_from_db()
         self.assertFalse(self.timer.active)
-        self.assertEqual(self.localtime_string(self.timer.end), params["end"])
+        self.assertEqual(timezone.localtime(self.timer.end), params["end"])
 
 
 class BMIFormsTestCase(FormsTestCaseBase):
@@ -159,7 +147,7 @@ class BMIFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "bmi": 35,
-            "date": self.localdate_string(),
+            "date": timezone.localdate(),
         }
 
         page = self.c.post("/bmi/add/", params, follow=True)
@@ -251,7 +239,7 @@ class DiaperChangeFormsTestCase(FormsTestCaseBase):
         child = models.Child.objects.first()
         params = {
             "child": child.id,
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
             "color": "black",
             "amount": 0.45,
         }
@@ -262,7 +250,7 @@ class DiaperChangeFormsTestCase(FormsTestCaseBase):
     def test_edit(self):
         params = {
             "child": self.change.child.id,
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
             "wet": self.change.wet,
             "solid": self.change.solid,
             "color": self.change.color,
@@ -300,8 +288,8 @@ class FeedingFormsTestCase(FormsTestCaseBase):
         start = end - timezone.timedelta(minutes=30)
         params = {
             "child": self.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
             "type": "formula",
             "method": "bottle",
             "amount": 0,
@@ -315,8 +303,8 @@ class FeedingFormsTestCase(FormsTestCaseBase):
         start = end - timezone.timedelta(minutes=30)
         params = {
             "child": self.feeding.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
             "type": self.feeding.type,
             "method": self.feeding.method,
             "amount": 100,
@@ -349,7 +337,7 @@ class HeadCircumferenceFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "head_circumference": 20,
-            "date": self.localdate_string(),
+            "date": timezone.localdate(),
         }
 
         page = self.c.post("/head-circumference/add/", params, follow=True)
@@ -404,7 +392,7 @@ class HeightFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "height": 13.5,
-            "date": self.localdate_string(),
+            "date": timezone.localdate(),
         }
 
         page = self.c.post("/height/add/", params, follow=True)
@@ -445,7 +433,7 @@ class NoteFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "note": "New note",
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
         }
 
         page = self.c.post("/notes/add/", params, follow=True)
@@ -486,7 +474,7 @@ class PumpingFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "amount": "50.0",
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
         }
 
         page = self.c.post("/pumping/add/", params, follow=True)
@@ -497,7 +485,7 @@ class PumpingFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.bp.child.id,
             "amount": self.bp.amount + 2,
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
         }
         page = self.c.post("/pumping/{}/".format(self.bp.id), params, follow=True)
         self.assertEqual(page.status_code, 200)
@@ -531,8 +519,8 @@ class SleepFormsTestCase(FormsTestCaseBase):
         start = end - timezone.timedelta(minutes=2)
         params = {
             "child": self.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
         }
 
         page = self.c.post("/sleep/add/", params, follow=True)
@@ -544,13 +532,13 @@ class SleepFormsTestCase(FormsTestCaseBase):
         start = end - timezone.timedelta(minutes=2)
         params = {
             "child": self.sleep.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
         }
         page = self.c.post("/sleep/{}/".format(self.sleep.id), params, follow=True)
         self.assertEqual(page.status_code, 200)
         self.sleep.refresh_from_db()
-        self.assertEqual(self.localtime_string(self.sleep.end), params["end"])
+        self.assertEqual(timezone.localtime(self.sleep.end), params["end"])
         self.assertContains(
             page, "Sleep entry for {} updated".format(str(self.sleep.child))
         )
@@ -614,7 +602,7 @@ class TaggedFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.note.child.id,
             "note": "Edited note",
-            "time": self.localdate_string(),
+            "time": timezone.localtime(),
             "tags": "oldtag,newtag",
         }
         page = self.c.post("/notes/{}/".format(self.note.id), params, follow=True)
@@ -642,7 +630,7 @@ class TaggedFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.note.child.id,
             "note": "Edited note (2)",
-            "time": self.localdate_string(),
+            "time": timezone.localtime(),
             "tags": "oldtag",
         }
         page = self.c.post("/notes/{}/".format(self.note.id), params, follow=True)
@@ -673,7 +661,7 @@ class TemperatureFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "temperature": "98.6",
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
         }
 
         page = self.c.post("/temperature/add/", params, follow=True)
@@ -686,7 +674,7 @@ class TemperatureFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.temp.child.id,
             "temperature": self.temp.temperature + 2,
-            "time": self.localtime_string(),
+            "time": timezone.localtime(),
         }
         page = self.c.post("/temperature/{}/".format(self.temp.id), params, follow=True)
         self.assertEqual(page.status_code, 200)
@@ -717,8 +705,8 @@ class TummyTimeFormsTestCase(FormsTestCaseBase):
         start = end - timezone.timedelta(minutes=2)
         params = {
             "child": self.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
             "milestone": "",
         }
 
@@ -733,8 +721,8 @@ class TummyTimeFormsTestCase(FormsTestCaseBase):
         start = end - timezone.timedelta(minutes=1, seconds=32)
         params = {
             "child": self.tt.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
             "milestone": "Moved head!",
         }
         page = self.c.post("/tummy-time/{}/".format(self.tt.id), params, follow=True)
@@ -761,7 +749,7 @@ class TimerFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "name": "Test Timer",
-            "start": self.localtime_string(),
+            "start": timezone.localtime(),
         }
         page = self.c.post("/timers/add/", params, follow=True)
         self.assertEqual(page.status_code, 200)
@@ -770,21 +758,21 @@ class TimerFormsTestCase(FormsTestCaseBase):
 
     def test_edit(self):
         start_time = self.timer.start - timezone.timedelta(hours=1)
-        params = {"name": "New Timer Name", "start": self.localtime_string(start_time)}
+        params = {"name": "New Timer Name", "start": timezone.localtime(start_time)}
         page = self.c.post(
             "/timers/{}/edit/".format(self.timer.id), params, follow=True
         )
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, params["name"])
         self.timer.refresh_from_db()
-        self.assertEqual(self.localtime_string(self.timer.start), params["start"])
+        self.assertEqual(timezone.localtime(self.timer.start), params["start"])
 
     def test_edit_stopped(self):
         self.timer.stop()
         params = {
             "name": "Edit stopped timer",
-            "start": self.localtime_string(self.timer.start),
-            "end": self.localtime_string(self.timer.end),
+            "start": timezone.localtime(self.timer.start),
+            "end": timezone.localtime(self.timer.end),
         }
         page = self.c.post(
             "/timers/{}/edit/".format(self.timer.id), params, follow=True
@@ -809,7 +797,7 @@ class ValidationsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child,
             "weight": "8.5",
-            "date": self.localdate_string(future),
+            "date": future,
         }
         entry = models.Weight.objects.create(**params)
 
@@ -822,8 +810,8 @@ class ValidationsTestCase(FormsTestCaseBase):
         start = end + timezone.timedelta(minutes=5)
         params = {
             "child": self.child,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
             "milestone": "",
         }
 
@@ -834,7 +822,7 @@ class ValidationsTestCase(FormsTestCaseBase):
         )
 
         start = end - timezone.timedelta(weeks=53)
-        params["start"] = self.localtime_string(start)
+        params["start"] = timezone.localtime(start)
         page = self.c.post("/tummy-time/add/", params, follow=True)
         self.assertEqual(page.status_code, 200)
         self.assertFormError(page, "form", None, "Duration too long.")
@@ -843,8 +831,8 @@ class ValidationsTestCase(FormsTestCaseBase):
         future = timezone.localtime() + timezone.timedelta(hours=1)
         params = {
             "child": self.child,
-            "start": self.localtime_string(),
-            "end": self.localtime_string(future),
+            "start": timezone.localtime(),
+            "end": timezone.localtime(future),
             "milestone": "",
         }
 
@@ -863,8 +851,8 @@ class ValidationsTestCase(FormsTestCaseBase):
         end = entry.end + timezone.timedelta(minutes=2)
         params = {
             "child": entry.child.id,
-            "start": self.localtime_string(start),
-            "end": self.localtime_string(end),
+            "start": timezone.localtime(start),
+            "end": timezone.localtime(end),
             "milestone": "",
         }
 
@@ -889,7 +877,7 @@ class WeightFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.child.id,
             "weight": 8.5,
-            "date": self.localdate_string(),
+            "date": timezone.localdate(),
         }
 
         page = self.c.post("/weight/add/", params, follow=True)
@@ -900,7 +888,7 @@ class WeightFormsTestCase(FormsTestCaseBase):
         params = {
             "child": self.weight.child.id,
             "weight": self.weight.weight + 1,
-            "date": self.localdate_string(),
+            "date": timezone.localdate(),
         }
         page = self.c.post("/weight/{}/".format(self.weight.id), params, follow=True)
         self.assertEqual(page.status_code, 200)
