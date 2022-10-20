@@ -3,6 +3,7 @@
 !base.py
 !ci.py
 !development.py
+!fly.py
 !gitpod.py
 !heroku.py
 !production.example.py
